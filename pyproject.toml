@@ -37,3 +37,4 @@ docstring-code-format = true
 
 [tool.basedpyright]
 exclude = ["proto/"]
+typeCheckingMode = "standard"

@@ -6,14 +6,18 @@ from services.wagon_service import WagonService
 
 
 def create_service(
-	service_type: str, port: int, rollercoaster_port: int = 50051
+	service_type: str,
+	port: int,
+	host: str = '0.0.0.0',
+	rollercoaster_host: str = 'localhost',
+	rollercoaster_port: int = 50051,
 ) -> RollercoasterService | WagonService | PassengerService:
 	if service_type == 'rollercoaster':
-		return RollercoasterService('localhost', port)
+		return RollercoasterService(host, port)
 	elif service_type == 'wagon':
-		return WagonService('localhost', port, 'localhost', rollercoaster_port)
+		return WagonService(host, port, rollercoaster_host, rollercoaster_port)
 	elif service_type == 'passenger':
-		return PassengerService('localhost', port, 'localhost', rollercoaster_port)
+		return PassengerService(host, port, rollercoaster_host, rollercoaster_port)
 	else:
 		raise ValueError(f'Unknown service type: {service_type}')
 
@@ -32,10 +36,16 @@ def main() -> None:
 		print(f'Unknown service type: {service_type}')
 		sys.exit(1)
 
-	service = create_service(service_type, port, rollercoaster_port)
+	service = create_service(
+		service_type, port, '0.0.0.0', 'localhost', rollercoaster_port
+	)
 	service.start_server()
+	print(f'{service_type} service started on 0.0.0.0:{port}')
 
-	if service_type in ['wagon', 'passenger'] and service.register_with_rollercoaster():
+	if (
+		service_type in ['wagon', 'passenger']
+		and not service.register_with_rollercoaster()
+	):
 		print(f'Failed to register {service_type}')
 		sys.exit(1)
 

@@ -33,7 +33,9 @@ class WagonService(BaseService, rollercoaster_pb2_grpc.wagonServicer):
 
 		if response.success:
 			self.wagon_id = response.id
+			print(f'Wagon registered successfully with ID {response.id}')
 			return True
+		print('Wagon registration failed')
 		return False
 
 	def stationed(self, request, context) -> empty_pb2.Empty:
@@ -50,7 +52,17 @@ class WagonService(BaseService, rollercoaster_pb2_grpc.wagonServicer):
 		return empty_pb2.Empty()
 
 	def _notify_arrival(self) -> None:
+		if self.wagon_id is None:
+			return
+
 		channel = self.create_channel(self.rollercoaster_host, self.rollercoaster_port)
-		stub = rollercoaster_pb2_grpc.rollercoasterStub(channel)
-		stub.get_status(empty_pb2.Empty())
-		channel.close()
+		try:
+			print(f'Wagon {self.wagon_id} ride completed, notifying rollercoaster')
+			stub = rollercoaster_pb2_grpc.rollercoasterStub(channel)
+			res: rollercoaster_pb2.StatusResponse = stub.get_status(empty_pb2.Empty())
+			print(res)
+
+		except Exception as e:
+			print(f'Failed to notify rollercoaster of arrival: {e}')
+		finally:
+			channel.close()

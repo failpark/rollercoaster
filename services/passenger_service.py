@@ -31,20 +31,26 @@ class PassengerService(BaseService, rollercoaster_pb2_grpc.passengerServicer):
 
 		if response.success:
 			self.passenger_id = response.id
+			print(f'Passenger registered successfully with ID {response.id}')
 			return True
+		print('Passenger registration failed')
 		return False
 
 	def i_am_boarding(self, request, context) -> empty_pb2.Empty:
 		self.is_on_ride = True
+		print('boarding')
 		return empty_pb2.Empty()
 
 	def i_am_disembarking(self, request, context) -> empty_pb2.Empty:
 		self.is_on_ride = False
+		print('disembarking')
 		return empty_pb2.Empty()
 
 	def get_status(self) -> dict[str, int | None | bool | str]:
-		return {
+		status = {
 			'passenger_id': self.passenger_id,
 			'is_on_ride': self.is_on_ride,
 			'address': self.address,
 		}
+		print(status)
+		return status

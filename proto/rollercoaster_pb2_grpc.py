@@ -315,12 +315,34 @@ class rollercoasterStub(object):
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=proto_dot_rollercoaster__pb2.StatusResponse.FromString,
                 _registered_method=True)
+        self.register_wagon = channel.unary_unary(
+                '/rollercoaster.rollercoaster/register_wagon',
+                request_serializer=proto_dot_rollercoaster__pb2.RegistrationRequest.SerializeToString,
+                response_deserializer=proto_dot_rollercoaster__pb2.RegistrationResponse.FromString,
+                _registered_method=True)
+        self.register_passenger = channel.unary_unary(
+                '/rollercoaster.rollercoaster/register_passenger',
+                request_serializer=proto_dot_rollercoaster__pb2.RegistrationRequest.SerializeToString,
+                response_deserializer=proto_dot_rollercoaster__pb2.RegistrationResponse.FromString,
+                _registered_method=True)
 
 
 class rollercoasterServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def get_status(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def register_wagon(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def register_passenger(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -333,6 +355,16 @@ def add_rollercoasterServicer_to_server(servicer, server):
                     servicer.get_status,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                     response_serializer=proto_dot_rollercoaster__pb2.StatusResponse.SerializeToString,
+            ),
+            'register_wagon': grpc.unary_unary_rpc_method_handler(
+                    servicer.register_wagon,
+                    request_deserializer=proto_dot_rollercoaster__pb2.RegistrationRequest.FromString,
+                    response_serializer=proto_dot_rollercoaster__pb2.RegistrationResponse.SerializeToString,
+            ),
+            'register_passenger': grpc.unary_unary_rpc_method_handler(
+                    servicer.register_passenger,
+                    request_deserializer=proto_dot_rollercoaster__pb2.RegistrationRequest.FromString,
+                    response_serializer=proto_dot_rollercoaster__pb2.RegistrationResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -362,6 +394,60 @@ class rollercoaster(object):
             '/rollercoaster.rollercoaster/get_status',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             proto_dot_rollercoaster__pb2.StatusResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def register_wagon(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/rollercoaster.rollercoaster/register_wagon',
+            proto_dot_rollercoaster__pb2.RegistrationRequest.SerializeToString,
+            proto_dot_rollercoaster__pb2.RegistrationResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def register_passenger(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/rollercoaster.rollercoaster/register_passenger',
+            proto_dot_rollercoaster__pb2.RegistrationRequest.SerializeToString,
+            proto_dot_rollercoaster__pb2.RegistrationResponse.FromString,
             options,
             channel_credentials,
             insecure,

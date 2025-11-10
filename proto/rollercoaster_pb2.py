@@ -25,7 +25,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19proto/rollercoaster.proto\x12\rrollercoaster\x1a\x1bgoogle/protobuf/empty.proto\"\\\n\x0eStatusResponse\x12\x14\n\x0ctotal_wagons\x18\x01 \x01(\x05\x12\x18\n\x10total_passengers\x18\x02 \x01(\x05\x12\x1a\n\x12waiting_passengers\x18\x03 \x01(\x05\"&\n\x0epassenger_list\x12\x14\n\x0cpassenger_id\x18\x01 \x03(\x05\x32\xbf\x01\n\x05wagon\x12;\n\tstationed\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12?\n\x06\x64\x65part\x12\x1d.rollercoaster.passenger_list\x1a\x16.google.protobuf.Empty\x12\x38\n\x06\x61rrive\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2\x91\x01\n\tpassenger\x12\x43\n\x11i_am_disembarking\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12?\n\ri_am_boarding\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2T\n\rrollercoaster\x12\x43\n\nget_status\x12\x16.google.protobuf.Empty\x1a\x1d.rollercoaster.StatusResponseB\x15Z\x13rollercoaster/protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x19proto/rollercoaster.proto\x12\rrollercoaster\x1a\x1bgoogle/protobuf/empty.proto\"\\\n\x0eStatusResponse\x12\x14\n\x0ctotal_wagons\x18\x01 \x01(\x05\x12\x18\n\x10total_passengers\x18\x02 \x01(\x05\x12\x1a\n\x12waiting_passengers\x18\x03 \x01(\x05\"1\n\x13RegistrationRequest\x12\x0c\n\x04host\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"3\n\x14RegistrationResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0f\n\x07success\x18\x02 \x01(\x08\"&\n\x0epassenger_list\x12\x14\n\x0cpassenger_id\x18\x01 \x03(\x05\x32\xbf\x01\n\x05wagon\x12;\n\tstationed\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12?\n\x06\x64\x65part\x12\x1d.rollercoaster.passenger_list\x1a\x16.google.protobuf.Empty\x12\x38\n\x06\x61rrive\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2\x91\x01\n\tpassenger\x12\x43\n\x11i_am_disembarking\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\x12?\n\ri_am_boarding\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty2\x8e\x02\n\rrollercoaster\x12\x43\n\nget_status\x12\x16.google.protobuf.Empty\x1a\x1d.rollercoaster.StatusResponse\x12Y\n\x0eregister_wagon\x12\".rollercoaster.RegistrationRequest\x1a#.rollercoaster.RegistrationResponse\x12]\n\x12register_passenger\x12\".rollercoaster.RegistrationRequest\x1a#.rollercoaster.RegistrationResponseB\x15Z\x13rollercoaster/protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -35,12 +35,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._serialized_options = b'Z\023rollercoaster/proto'
   _globals['_STATUSRESPONSE']._serialized_start=73
   _globals['_STATUSRESPONSE']._serialized_end=165
-  _globals['_PASSENGER_LIST']._serialized_start=167
-  _globals['_PASSENGER_LIST']._serialized_end=205
-  _globals['_WAGON']._serialized_start=208
-  _globals['_WAGON']._serialized_end=399
-  _globals['_PASSENGER']._serialized_start=402
-  _globals['_PASSENGER']._serialized_end=547
-  _globals['_ROLLERCOASTER']._serialized_start=549
-  _globals['_ROLLERCOASTER']._serialized_end=633
+  _globals['_REGISTRATIONREQUEST']._serialized_start=167
+  _globals['_REGISTRATIONREQUEST']._serialized_end=216
+  _globals['_REGISTRATIONRESPONSE']._serialized_start=218
+  _globals['_REGISTRATIONRESPONSE']._serialized_end=269
+  _globals['_PASSENGER_LIST']._serialized_start=271
+  _globals['_PASSENGER_LIST']._serialized_end=309
+  _globals['_WAGON']._serialized_start=312
+  _globals['_WAGON']._serialized_end=503
+  _globals['_PASSENGER']._serialized_start=506
+  _globals['_PASSENGER']._serialized_end=651
+  _globals['_ROLLERCOASTER']._serialized_start=654
+  _globals['_ROLLERCOASTER']._serialized_end=924
 # @@protoc_insertion_point(module_scope)

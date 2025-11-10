@@ -12,6 +12,16 @@ message StatusResponse {
 	int32 waiting_passengers = 3;
 }
 
+message RegistrationRequest {
+	string host = 1;
+	int32 port = 2;
+}
+
+message RegistrationResponse {
+	int32 id = 1;
+	bool success = 2;
+}
+
 service wagon {
 	// Wagon stationed and waiting to be filled (blocks until ready)
 	rpc stationed(google.protobuf.Empty) returns (google.protobuf.Empty);
@@ -27,6 +37,8 @@ service passenger {
 
 service rollercoaster {
 	rpc get_status(google.protobuf.Empty) returns (StatusResponse);
+	rpc register_wagon(RegistrationRequest) returns (RegistrationResponse);
+	rpc register_passenger(RegistrationRequest) returns (RegistrationResponse);
 }
 
 message passenger_list {

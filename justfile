@@ -14,10 +14,10 @@ compile:
 	uv run python3 -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. --mypy_out=. proto/rollercoaster.proto
 
 start:
-	uv run main.py rollercoaster 50051 50051
+	uv run main.py rollercoaster 50051
 
 start-passenger *port=start:
-	uv run main.py passenger {{port}} 50051
+	uv run main.py passenger {{port}}
 
 start-wagon *port=end:
-	uv run main.py wagon {{port}} 50051
+	uv run main.py wagon {{port}}

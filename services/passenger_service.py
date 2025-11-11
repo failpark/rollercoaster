@@ -2,10 +2,10 @@ import grpc
 from google.protobuf import empty_pb2
 
 from proto import rollercoaster_pb2, rollercoaster_pb2_grpc
-from services.base import BaseService
+from services.consumer_service import ConsumerService
 
 
-class PassengerService(BaseService, rollercoaster_pb2_grpc.passengerServicer):
+class PassengerService(ConsumerService, rollercoaster_pb2_grpc.passengerServicer):
 	def __init__(
 		self,
 		host: str,
@@ -44,6 +44,7 @@ class PassengerService(BaseService, rollercoaster_pb2_grpc.passengerServicer):
 	def i_am_disembarking(self, request, context) -> empty_pb2.Empty:
 		self.is_on_ride = False
 		print('disembarking')
+		self.delayed_retry()
 		return empty_pb2.Empty()
 
 	def get_status(self) -> dict[str, int | None | bool | str]:

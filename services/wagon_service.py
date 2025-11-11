@@ -4,10 +4,10 @@ import grpc
 from google.protobuf import empty_pb2
 
 from proto import rollercoaster_pb2, rollercoaster_pb2_grpc
-from services.base import BaseService
+from services.consumer_service import ConsumerService
 
 
-class WagonService(BaseService, rollercoaster_pb2_grpc.wagonServicer):
+class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 	def __init__(
 		self,
 		host: str,
@@ -49,6 +49,7 @@ class WagonService(BaseService, rollercoaster_pb2_grpc.wagonServicer):
 
 	def arrive(self, request, context) -> empty_pb2.Empty:
 		self.current_passengers = []
+		self.delayed_retry()
 		return empty_pb2.Empty()
 
 	def _notify_arrival(self) -> None:

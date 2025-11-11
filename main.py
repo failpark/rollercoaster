@@ -1,5 +1,6 @@
 import sys
 
+from services.consumer_service import ConsumerService
 from services.passenger_service import PassengerService
 from services.rollercoaster_service import RollercoasterService
 from services.wagon_service import WagonService
@@ -24,26 +25,30 @@ def create_service(
 
 def main() -> None:
 	if len(sys.argv) < 3:
-		print('Usage: python main.py <service_type> <port> [rollercoaster_port]')
+		print(
+			'Usage: python main.py <service_type> <port> [rollercoaster_host] [rollercoaster_port]'
+		)
 		print('service_type: rollercoaster, wagon, or passenger')
 		sys.exit(1)
 
 	service_type = sys.argv[1]
+	host = '0.0.0.0'
 	port = int(sys.argv[2])
-	rollercoaster_port = int(sys.argv[3]) if len(sys.argv) > 3 else 50051
+	rollercoaster_host = str(sys.argv[3]) if len(sys.argv) >= 4 else 'localhost'
+	rollercoaster_port = int(sys.argv[4]) if len(sys.argv) == 5 else 50051
 
 	if service_type not in ['rollercoaster', 'wagon', 'passenger']:
 		print(f'Unknown service type: {service_type}')
 		sys.exit(1)
 
 	service = create_service(
-		service_type, port, '0.0.0.0', 'localhost', rollercoaster_port
+		service_type, port, host, rollercoaster_host, rollercoaster_port
 	)
 	service.start_server()
-	print(f'{service_type} service started on 0.0.0.0:{port}')
+	print(f'{service_type} service started on {host}:{port}')
 
 	if (
-		service_type in ['wagon', 'passenger']
+		isinstance(service, (WagonService | PassengerService))
 		and not service.register_with_rollercoaster()
 	):
 		print(f'Failed to register {service_type}')

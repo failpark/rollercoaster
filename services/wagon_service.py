@@ -43,6 +43,7 @@ class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 
 	def depart(self, request, context) -> empty_pb2.Empty:
 		self.current_passengers = list(request.passenger_id)
+		print('Ride takes 5 sek')
 		time.sleep(5)
 		self._notify_arrival()
 		return empty_pb2.Empty()

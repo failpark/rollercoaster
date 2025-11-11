@@ -1,6 +1,5 @@
 import sys
 
-from services.consumer_service import ConsumerService
 from services.passenger_service import PassengerService
 from services.rollercoaster_service import RollercoasterService
 from services.wagon_service import WagonService

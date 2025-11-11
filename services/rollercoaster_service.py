@@ -13,10 +13,9 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 		super().__init__(host, port)
 		self._wagons: dict[int, tuple[str, int]] = {}
 		self._passengers: dict[int, tuple[str, int]] = {}
+		self.wagon_cap = 2
 		self._waiting_wagons: list[int] = []
 		self._waiting_passengers: list[int] = []
-		self._next_wagon_id = 1
-		self._next_passenger_id = 1
 		self._lock = threading.Lock()
 		self._ride_thread: threading.Thread | None = None
 		self._running = False
@@ -45,8 +44,7 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 			return rollercoaster_pb2.RegistrationResponse(id=wagon_id, success=True)
 
 	def get_next_wid(self):
-		self._next_wagon_id += 1
-		return self._next_wagon_id - 1
+		return len(self._wagons)
 
 	def get_wagon_id(self, request):
 		return next(
@@ -81,8 +79,7 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 		)
 
 	def get_next_pid(self):
-		self._next_passenger_id += 1
-		return self._next_passenger_id - 1
+		return len(self._passengers)
 
 	def call_wagon_stationed(self, wagon_host: str, wagon_port: int) -> None:
 		channel = self.create_channel(wagon_host, wagon_port)
@@ -150,13 +147,12 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 				with self._lock:
 					if (
 						len(self._waiting_wagons) >= 1
-						and len(self._waiting_passengers) >= 2
+						and len(self._waiting_passengers) >= self.wagon_cap
 					):
 						wagon_id = self._waiting_wagons.pop(0)
 						wagon_host, wagon_port = self._wagons[wagon_id]
 
-						# Take up to 4 passengers (typical rollercoaster capacity)
-						passengers_for_ride = self._waiting_passengers[:4]
+						passengers_for_ride = self._waiting_passengers[: self.wagon_cap]
 						self.remove_waiting_passengers(passengers_for_ride)
 
 						print(
@@ -206,11 +202,7 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 	def _handle_ride_completion(
 		self, wagon_host: str, wagon_port: int, passenger_ids: list[int]
 	) -> None:
-		"""Handle the completion of a ride after wagon signals it's done"""
 		try:
-			# Wait for the ride to complete (wagon handles the 5 second delay)
-			# The wagon will call its own arrive() method, so we wait a bit longer
-			print('sleep 7 sek')
 			time.sleep(7)  # Wait slightly longer than wagon's ride time
 
 			# Find the wagon ID for this host/port combination

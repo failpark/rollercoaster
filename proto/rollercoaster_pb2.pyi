@@ -70,6 +70,40 @@ class RegistrationResponse(google.protobuf.message.Message):
 global___RegistrationResponse = RegistrationResponse
 
 @typing.final
+class arrive_request(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    WAGON_ID_FIELD_NUMBER: builtins.int
+    PASSENGER_ID_FIELD_NUMBER: builtins.int
+    wagon_id: builtins.int
+    @property
+    def passenger_id(self) -> google.protobuf.internal.containers.RepeatedScalarFieldContainer[builtins.int]: ...
+    def __init__(
+        self,
+        *,
+        wagon_id: builtins.int = ...,
+        passenger_id: collections.abc.Iterable[builtins.int] | None = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["passenger_id", b"passenger_id", "wagon_id", b"wagon_id"]) -> None: ...
+
+global___arrive_request = arrive_request
+
+@typing.final
+class arrive_response(google.protobuf.message.Message):
+    DESCRIPTOR: google.protobuf.descriptor.Descriptor
+
+    SUCCESS_FIELD_NUMBER: builtins.int
+    success: builtins.bool
+    def __init__(
+        self,
+        *,
+        success: builtins.bool = ...,
+    ) -> None: ...
+    def ClearField(self, field_name: typing.Literal["success", b"success"]) -> None: ...
+
+global___arrive_response = arrive_response
+
+@typing.final
 class passenger_list(google.protobuf.message.Message):
     DESCRIPTOR: google.protobuf.descriptor.Descriptor
 

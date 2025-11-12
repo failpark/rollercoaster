@@ -38,19 +38,11 @@ class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 		print('Wagon registration failed')
 		return False
 
-	def stationed(self, request, context) -> empty_pb2.Empty:
-		return empty_pb2.Empty()
-
 	def depart(self, request, context) -> empty_pb2.Empty:
 		self.current_passengers = list(request.passenger_id)
 		print('Ride takes 5 sek')
 		time.sleep(5)
 		self._notify_arrival()
-		return empty_pb2.Empty()
-
-	def arrive(self, request, context) -> empty_pb2.Empty:
-		self.current_passengers = []
-		self.delayed_retry()
 		return empty_pb2.Empty()
 
 	def _notify_arrival(self) -> None:
@@ -61,8 +53,14 @@ class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 		try:
 			print(f'Wagon {self.wagon_id} ride completed, notifying rollercoaster')
 			stub = rollercoaster_pb2_grpc.rollercoasterStub(channel)
-			res: rollercoaster_pb2.StatusResponse = stub.get_status(empty_pb2.Empty())
+			arrive_request = rollercoaster_pb2.arrive_request(
+				wagon_id=self.wagon_id, passenger_id=self.current_passengers
+			)
+			res = rollercoaster_pb2.StatusResponse = stub.arrive(arrive_request)
 			print(res)
+			# TODO handle retry on res.sucess == false
+			self.current_passengers = []
+			self.delayed_retry()
 
 		except Exception as e:
 			print(f'Failed to notify rollercoaster of arrival: {e}')

@@ -1,5 +1,6 @@
 import threading
 import time
+from collections import deque
 
 import grpc
 from google.protobuf import empty_pb2
@@ -13,8 +14,9 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 		super().__init__(host, port)
 		self._wagons: dict[int, tuple[str, int]] = {}
 		self._passengers: dict[int, tuple[str, int]] = {}
+		self._wagon_order = deque()
 		self.wagon_cap = 2
-		self._waiting_wagons: list[int] = []
+		self._waiting_wagons = deque()
 		self._waiting_passengers: list[int] = []
 		self._lock = threading.Lock()
 		self._ride_thread: threading.Thread | None = None
@@ -42,6 +44,19 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 			self._waiting_wagons.append(wagon_id)
 			print(f'Wagon {wagon_id} registered from {request.host}:{request.port}')
 			return rollercoaster_pb2.RegistrationResponse(id=wagon_id, success=True)
+
+	def arrive(self, request, context) -> rollercoaster_pb2.arrive_response:
+		wagon_id = request.wagon_id
+		if wagon_id != self._wagon_order.index(0):
+			return rollercoaster_pb2.arrive_response(success=False)
+		self._wagon_order.popleft()
+		passenger_ids = list(request.passenger_id)
+		for pid in passenger_ids:
+			if pid in self._passengers:
+				p_host, p_port = self._passengers[pid]
+				self.call_passenger_disembarking(p_host, p_port)
+
+		return rollercoaster_pb2.arrive_response(success=True)
 
 	def get_next_wid(self):
 		return len(self._wagons)
@@ -80,13 +95,6 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 
 	def get_next_pid(self):
 		return len(self._passengers)
-
-	def call_wagon_stationed(self, wagon_host: str, wagon_port: int) -> None:
-		channel = self.create_channel(wagon_host, wagon_port)
-		stub = rollercoaster_pb2_grpc.wagonStub(channel)
-		print('wagon stationed')
-		stub.stationed(empty_pb2.Empty())
-		channel.close()
 
 	def call_wagon_depart(
 		self, wagon_host: str, wagon_port: int, passenger_ids: list[int]
@@ -149,7 +157,7 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 						len(self._waiting_wagons) >= 1
 						and len(self._waiting_passengers) >= self.wagon_cap
 					):
-						wagon_id = self._waiting_wagons.pop(0)
+						wagon_id = self._waiting_wagons.popleft()
 						wagon_host, wagon_port = self._wagons[wagon_id]
 
 						passengers_for_ride = self._waiting_passengers[: self.wagon_cap]
@@ -158,8 +166,8 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 						print(
 							f'Starting ride: wagon {wagon_id} with passengers {passengers_for_ride}'
 						)
+						self._wagon_order.append(wagon_id)
 
-						# Release lock before making network calls
 						self._coordinate_ride(
 							wagon_host, wagon_port, passengers_for_ride
 						)
@@ -172,73 +180,18 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 		self, wagon_host: str, wagon_port: int, passenger_ids: list[int]
 	) -> None:
 		try:
-			# 1. Notify wagon it's stationed
-			# self.call_wagon_stationed(wagon_host, wagon_port)
-
-			# 2. Notify passengers they're boarding
 			for pid in passenger_ids:
 				if pid in self._passengers:
 					p_host, p_port = self._passengers[pid]
 					self.call_passenger_boarding(p_host, p_port)
 
-			# 3. Tell wagon to depart with passengers
 			self.call_wagon_depart(wagon_host, wagon_port, passenger_ids)
-
-			# 4. Schedule ride completion handling
-			# The wagon's depart() method will handle the ride duration and call arrive()
-			# We need to track this ride and handle completion
-			threading.Thread(
-				target=self._handle_ride_completion,
-				args=(wagon_host, wagon_port, passenger_ids),
-				daemon=True,
-			).start()
 
 		except Exception as e:
 			print(f'Ride coordination error: {e}')
 			# Return passengers to waiting queue on error
 			with self._lock:
 				self._waiting_passengers.extend(passenger_ids)
-
-	def _handle_ride_completion(
-		self, wagon_host: str, wagon_port: int, passenger_ids: list[int]
-	) -> None:
-		try:
-			time.sleep(7)  # Wait slightly longer than wagon's ride time
-
-			# Find the wagon ID for this host/port combination
-			wagon_id = None
-			with self._lock:
-				for wid, (host, port) in self._wagons.items():
-					if host == wagon_host and port == wagon_port:
-						wagon_id = wid
-						break
-
-			if wagon_id is not None:
-				self.wagon_finished_ride(wagon_id, passenger_ids)
-
-		except Exception as e:
-			print(f'Ride completion handling error: {e}')
-
-	def wagon_finished_ride(self, wagon_id: int, passenger_ids: list[int]) -> None:
-		"""Called when wagon notifies of ride completion"""
-		with self._lock:
-			if wagon_id not in self._wagons:
-				return
-
-			wagon_host, wagon_port = self._wagons[wagon_id]
-
-			# Notify passengers they're disembarking
-			for pid in passenger_ids:
-				if pid in self._passengers:
-					p_host, p_port = self._passengers[pid]
-					self.call_passenger_disembarking(p_host, p_port)
-
-			# Notify wagon of arrival
-			self.call_wagon_arrive(wagon_host, wagon_port)
-
-			# Make wagon available again
-			self._waiting_wagons.append(wagon_id)
-			print(f'Ride completed: wagon {wagon_id} with passengers {passenger_ids}')
 
 	def stop_server(self) -> None:
 		self._running = False

@@ -35,19 +35,9 @@ class wagonStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.stationed = channel.unary_unary(
-                '/rollercoaster.wagon/stationed',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                _registered_method=True)
         self.depart = channel.unary_unary(
                 '/rollercoaster.wagon/depart',
                 request_serializer=proto_dot_rollercoaster__pb2.passenger_list.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                _registered_method=True)
-        self.arrive = channel.unary_unary(
-                '/rollercoaster.wagon/arrive',
-                request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
                 response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                 _registered_method=True)
 
@@ -55,22 +45,8 @@ class wagonStub(object):
 class wagonServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def stationed(self, request, context):
-        """Wagon stationed and waiting to be filled (blocks until ready)
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def depart(self, request, context):
         """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def arrive(self, request, context):
-        """finished ride -> start disembarking
-        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -78,19 +54,9 @@ class wagonServicer(object):
 
 def add_wagonServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'stationed': grpc.unary_unary_rpc_method_handler(
-                    servicer.stationed,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            ),
             'depart': grpc.unary_unary_rpc_method_handler(
                     servicer.depart,
                     request_deserializer=proto_dot_rollercoaster__pb2.passenger_list.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            ),
-            'arrive': grpc.unary_unary_rpc_method_handler(
-                    servicer.arrive,
-                    request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
                     response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             ),
     }
@@ -103,33 +69,6 @@ def add_wagonServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class wagon(object):
     """Missing associated documentation comment in .proto file."""
-
-    @staticmethod
-    def stationed(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/rollercoaster.wagon/stationed',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
 
     @staticmethod
     def depart(request,
@@ -147,33 +86,6 @@ class wagon(object):
             target,
             '/rollercoaster.wagon/depart',
             proto_dot_rollercoaster__pb2.passenger_list.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def arrive(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/rollercoaster.wagon/arrive',
-            google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
             google_dot_protobuf_dot_empty__pb2.Empty.FromString,
             options,
             channel_credentials,
@@ -325,6 +237,11 @@ class rollercoasterStub(object):
                 request_serializer=proto_dot_rollercoaster__pb2.RegistrationRequest.SerializeToString,
                 response_deserializer=proto_dot_rollercoaster__pb2.RegistrationResponse.FromString,
                 _registered_method=True)
+        self.arrive = channel.unary_unary(
+                '/rollercoaster.rollercoaster/arrive',
+                request_serializer=proto_dot_rollercoaster__pb2.arrive_request.SerializeToString,
+                response_deserializer=proto_dot_rollercoaster__pb2.arrive_response.FromString,
+                _registered_method=True)
 
 
 class rollercoasterServicer(object):
@@ -348,6 +265,13 @@ class rollercoasterServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def arrive(self, request, context):
+        """finished ride -> start disembarking
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_rollercoasterServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -365,6 +289,11 @@ def add_rollercoasterServicer_to_server(servicer, server):
                     servicer.register_passenger,
                     request_deserializer=proto_dot_rollercoaster__pb2.RegistrationRequest.FromString,
                     response_serializer=proto_dot_rollercoaster__pb2.RegistrationResponse.SerializeToString,
+            ),
+            'arrive': grpc.unary_unary_rpc_method_handler(
+                    servicer.arrive,
+                    request_deserializer=proto_dot_rollercoaster__pb2.arrive_request.FromString,
+                    response_serializer=proto_dot_rollercoaster__pb2.arrive_response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -448,6 +377,33 @@ class rollercoaster(object):
             '/rollercoaster.rollercoaster/register_passenger',
             proto_dot_rollercoaster__pb2.RegistrationRequest.SerializeToString,
             proto_dot_rollercoaster__pb2.RegistrationResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def arrive(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/rollercoaster.rollercoaster/arrive',
+            proto_dot_rollercoaster__pb2.arrive_request.SerializeToString,
+            proto_dot_rollercoaster__pb2.arrive_response.FromString,
             options,
             channel_credentials,
             insecure,

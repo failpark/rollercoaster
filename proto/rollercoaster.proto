@@ -23,11 +23,7 @@ message RegistrationResponse {
 }
 
 service wagon {
-	// Wagon stationed and waiting to be filled (blocks until ready)
-	rpc stationed(google.protobuf.Empty) returns (google.protobuf.Empty);
 	rpc depart(passenger_list) returns (google.protobuf.Empty);
-	// finished ride -> start disembarking
-	rpc arrive(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 service passenger {
@@ -39,6 +35,17 @@ service rollercoaster {
 	rpc get_status(google.protobuf.Empty) returns (StatusResponse);
 	rpc register_wagon(RegistrationRequest) returns (RegistrationResponse);
 	rpc register_passenger(RegistrationRequest) returns (RegistrationResponse);
+	// finished ride -> start disembarking
+	rpc arrive(arrive_request) returns (arrive_response);
+}
+
+message arrive_request {
+	int32 wagon_id = 1;
+	repeated int32 passenger_id = 2;
+}
+
+message arrive_response {
+	bool success = 1;
 }
 
 message passenger_list {

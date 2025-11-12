@@ -47,16 +47,19 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 
 	def arrive(self, request, context) -> rollercoaster_pb2.arrive_response:
 		wagon_id = request.wagon_id
-		if wagon_id != self._wagon_order.index(0):
+		try:
+			if self._wagon_order.index(wagon_id) != 0:
+				return rollercoaster_pb2.arrive_response(success=False)
+			self._wagon_order.popleft()
+			passenger_ids = list(request.passenger_id)
+			for pid in passenger_ids:
+				if pid in self._passengers:
+					p_host, p_port = self._passengers[pid]
+					self.call_passenger_disembarking(p_host, p_port)
+	
+			return rollercoaster_pb2.arrive_response(success=True)
+		except ValueError:
 			return rollercoaster_pb2.arrive_response(success=False)
-		self._wagon_order.popleft()
-		passenger_ids = list(request.passenger_id)
-		for pid in passenger_ids:
-			if pid in self._passengers:
-				p_host, p_port = self._passengers[pid]
-				self.call_passenger_disembarking(p_host, p_port)
-
-		return rollercoaster_pb2.arrive_response(success=True)
 
 	def get_next_wid(self):
 		return len(self._wagons)
@@ -104,13 +107,6 @@ class RollercoasterService(BaseService, rollercoaster_pb2_grpc.rollercoasterServ
 		passenger_list = rollercoaster_pb2.passenger_list(passenger_id=passenger_ids)
 		print('wagon depart')
 		stub.depart(passenger_list)
-		channel.close()
-
-	def call_wagon_arrive(self, wagon_host: str, wagon_port: int) -> None:
-		channel = self.create_channel(wagon_host, wagon_port)
-		stub = rollercoaster_pb2_grpc.wagonStub(channel)
-		print('wagon arrive')
-		stub.arrive(empty_pb2.Empty())
 		channel.close()
 
 	def call_passenger_boarding(self, passenger_host: str, passenger_port: int) -> None:

@@ -1,3 +1,4 @@
+import threading
 import time
 
 import grpc
@@ -40,12 +41,14 @@ class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 
 	def depart(self, request, context) -> empty_pb2.Empty:
 		self.current_passengers = list(request.passenger_id)
-		print('Ride takes 5 sek')
-		time.sleep(5)
-		self._notify_arrival()
+		threading.Thread(
+			target=self._notify_arrival,
+			daemon=True
+		).start()
 		return empty_pb2.Empty()
 
 	def _notify_arrival(self) -> None:
+		time.sleep(5)
 		if self.wagon_id is None:
 			return
 
@@ -57,12 +60,12 @@ class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 				wagon_id=self.wagon_id, passenger_id=self.current_passengers
 			)
 			res = rollercoaster_pb2.StatusResponse = stub.arrive(arrive_request)
-			print(res)
-			# TODO handle retry on res.sucess == false
-			self.current_passengers = []
-			self.delayed_retry()
-
+			print(res.success)
+			if (res.success):
+				self.current_passengers = []
+				self.delayed_retry()
+			channel.close()
+			if (not res.success):
+				self._notify_arrival()
 		except Exception as e:
 			print(f'Failed to notify rollercoaster of arrival: {e}')
-		finally:
-			channel.close()

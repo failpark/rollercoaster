@@ -60,7 +60,6 @@ class WagonService(ConsumerService, rollercoaster_pb2_grpc.wagonServicer):
 				wagon_id=self.wagon_id, passenger_id=self.current_passengers
 			)
 			res = rollercoaster_pb2.StatusResponse = stub.arrive(arrive_request)
-			print(res.success)
 			if (res.success):
 				self.current_passengers = []
 				self.delayed_retry()

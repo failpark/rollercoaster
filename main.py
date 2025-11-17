@@ -1,5 +1,7 @@
 import sys
 
+import socket
+
 from services.passenger_service import PassengerService
 from services.rollercoaster_service import RollercoasterService
 from services.wagon_service import WagonService
@@ -32,6 +34,7 @@ def main() -> None:
 
 	service_type = sys.argv[1]
 	host = '0.0.0.0'
+	# host = (socket.gethostbyname(socket.gethostname()))
 	port = int(sys.argv[2])
 	rollercoaster_host = str(sys.argv[3]) if len(sys.argv) >= 4 else 'localhost'
 	rollercoaster_port = int(sys.argv[4]) if len(sys.argv) == 5 else 50051

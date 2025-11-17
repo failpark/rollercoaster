@@ -16,8 +16,8 @@ compile:
 start:
 	uv run main.py rollercoaster 50051
 
-start-passenger *port=start:
-	uv run main.py passenger {{port}}
+start-passenger *port='0':
+	uv run main.py passenger "$(({{start}}+{{port}}))"
 
-start-wagon *port=end:
-	uv run main.py wagon {{port}}
+start-wagon *port='0':
+	uv run main.py wagon  "$(({{end}}-{{port}}))"
